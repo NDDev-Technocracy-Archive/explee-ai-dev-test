@@ -1,17 +1,29 @@
-# Synthetic GitHub-token-shaped fixtures for the trace redaction tests; their built-in CRC32 checksums are invalid, so they are not issued tokens.
-# Reviewed 2026-11-01 during the CI baseline migration; only these exact historical findings are suppressed.
-02db26253bb63a32d8ee874a894419cec0b6ff1b:task1-spend-observability/TRACE.md:github-pat:2993
-02db26253bb63a32d8ee874a894419cec0b6ff1b:task1-spend-observability/TRACE.md:github-pat:3197
-11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:generic-api-key:43
-11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:github-pat:107
-11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:github-pat:39
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:generic-api-key:43
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:128
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:131
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:39
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:59
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:70
-1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:71
-70a70498711c82b618d67bf1770c082a258160ad:tests/test_export_trace.py:github-pat:415
+# Reviewed historical Gitleaks findings (2026-11-01, CI baseline migration, std-0004-ci-cd-workflows#205).
+# Each fingerprint below is a proven non-credential; values are never copied here. New findings stay blocking.
+
+# submission/task1-TRACE.md:2875 @ebbe52fcf7ff [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
 ebbe52fcf7ff0ed8c7d859665ec830facefe5c04:submission/task1-TRACE.md:github-pat:2875
+# submission/task1-TRACE.md:3079 @ebbe52fcf7ff [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
 ebbe52fcf7ff0ed8c7d859665ec830facefe5c04:submission/task1-TRACE.md:github-pat:3079
+# task1-spend-observability/TRACE.md:2993 @02db26253bb6 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+02db26253bb63a32d8ee874a894419cec0b6ff1b:task1-spend-observability/TRACE.md:github-pat:2993
+# task1-spend-observability/TRACE.md:3197 @02db26253bb6 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+02db26253bb63a32d8ee874a894419cec0b6ff1b:task1-spend-observability/TRACE.md:github-pat:3197
+# tests/test_export_trace.py:39 @11fac9e8871b [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:github-pat:39
+# tests/test_export_trace.py:39 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:39
+# tests/test_export_trace.py:59 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:59
+# tests/test_export_trace.py:70 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:70
+# tests/test_export_trace.py:71 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:71
+# tests/test_export_trace.py:107 @11fac9e8871b [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:github-pat:107
+# tests/test_export_trace.py:128 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:128
+# tests/test_export_trace.py:131 @1208dd870332 [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:131
+# tests/test_export_trace.py:415 @70a70498711c [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
+70a70498711c82b618d67bf1770c082a258160ad:tests/test_export_trace.py:github-pat:415
