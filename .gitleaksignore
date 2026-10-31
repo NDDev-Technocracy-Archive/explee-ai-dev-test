@@ -27,3 +27,9 @@ ebbe52fcf7ff0ed8c7d859665ec830facefe5c04:submission/task1-TRACE.md:github-pat:30
 1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:github-pat:131
 # tests/test_export_trace.py:415 @70a70498711c [github-pat]: GitHub-token-shaped test vector for the trace secret scanner; its CRC32 suffix is invalid, so GitHub never issued it
 70a70498711c82b618d67bf1770c082a258160ad:tests/test_export_trace.py:github-pat:415
+
+# tests/test_export_trace.py:43 @1208dd870332 and @11fac9e8871b [generic-api-key]: Deepgram-shaped value,
+# NOT proven fictitious. Accepted risk by the owner's decision of 2026-11-01 (issue #8): the key does not
+# belong to the owner, revocation is impossible from our side, the repository is archived; history is kept.
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:generic-api-key:43
+11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:generic-api-key:43
