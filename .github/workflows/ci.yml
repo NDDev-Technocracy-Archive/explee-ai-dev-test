@@ -51,10 +51,16 @@ jobs:
           fetch-depth: 0        # consistency checks need history to compare SHAs
           persist-credentials: false
 
+      # The tool versions live in this file, so it keys the cache. setup-uv prunes
+      # the cache to source-built wheels and only main saves it: a pull request
+      # restores what main validated and never writes an entry of its own.
       - name: Install uv
         uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e  # v10.3.2
         with:
-          enable-cache: true
+          enable-cache: 'true'
+          cache-dependency-glob: .github/workflows/ci.yml
+          save-cache: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          prune-cache: 'true'
 
       - name: Record tool versions
         run: |
