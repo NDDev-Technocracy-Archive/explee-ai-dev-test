@@ -1,142 +1,50 @@
 name: CI
 
-# Runs on GitHub-hosted ubuntu-24.04 runners, free for this repository, and
-# deliberately independent of the publication decision, Actions runs on private
-# repositories too.
-#
-# Why this exists: the external review's central point is that a reviewer who
-# cannot run anything must treat every machine-level claim here as an agent
-# assertion. A CI run attached to a commit is the one piece of evidence a grader
-# can check without trusting us.
-#
-# Every tool version below is pinned. An unpinned `--with ruff` once resolved to
-# 0.16.4 in CI while the local machine ran 0.15.17, so the same tree was "All
-# checks passed" locally and 49 errors here, and every local "gates green" claim
-# was about a different check than the one that ran. A gate that moves under you
-# is not a gate.
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, labeled, edited]
   workflow_dispatch:
+
+permissions: {}
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-permissions:
-  contents: read
-
-# Third-party actions are pinned to full commit SHAs, not tags. A tag is a
-# moving pointer: the same workflow can run different code tomorrow without a
-# commit here. That is the identical defect this file already documents for
-# ruff, where an unpinned version made a green local run and a red CI run
-# describe the same tree - and it is what OSSF Scorecard's Pinned-Dependencies
-# check looks for. The trailing comment records which tag each SHA was.
-env:
-  RUFF_VERSION: "0.15.17"
-  PYRIGHT_VERSION: "1.1.411"
-  PYTEST_VERSION: "8.3.4"
-
 jobs:
   gates:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          fetch-depth: 0        # consistency checks need history to compare SHAs
-          persist-credentials: false
-
-      # The tool versions live in this file, so it keys the cache. setup-uv prunes
-      # the cache to source-built wheels and only main saves it: a pull request
-      # restores what main validated and never writes an entry of its own.
-      - name: Install uv
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e  # v10.3.2
-        with:
-          enable-cache: 'true'
-          cache-dependency-glob: .github/workflows/ci.yml
-          save-cache: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-          prune-cache: 'true'
-
-      - name: Record tool versions
-        run: |
-          uv --version
-          python3 -V
-          uv run --with "ruff==${RUFF_VERSION}" ruff --version
-          uv run --with "pyright==${PYRIGHT_VERSION}" pyright --version
-          echo "commit: ${GITHUB_SHA}"
-
-      - name: pytest
-        run: uv run --with "pytest==${PYTEST_VERSION}" pytest tests/ -q
-
-      - name: ruff
-        run: uv run --with "ruff==${RUFF_VERSION}" ruff check .
-
-      # Blocking, with NOTHING excluded. This comment used to describe a
-      # compromise: four Task 2 files were excluded in pyrightconfig.json while
-      # that task was mid-flight, so the gate covered "the other 95%". That
-      # exclusion came out in fdb52b7 and the compromise no longer exists.
-      #
-      # pyrightconfig.json now excludes only .venv, __pycache__, node_modules,
-      # browser and docs. The repository reports 0 errors with no task-related
-      # path hidden, so the zero is earned rather than scoped.
-      #
-      # Verified by making it fail rather than by reading the config: injecting
-      # `return "not an int"` into tests/test_task2_blockbootstrap.py produced
-      # exactly 1 reportReturnType error, and removing it returned 0. A config
-      # that merely LOOKS unscoped is not evidence that the files are checked.
-      #
-      # The comment is corrected rather than deleted because it was true when
-      # written and went false when the thing it described was fixed - the same
-      # class as a status row that outlived its own condition, and it argued for
-      # a weaker gate than the one now running.
-      - name: pyright
-        run: uv run --with "pyright==${PYRIGHT_VERSION}" --with "pytest==${PYTEST_VERSION}" --with httpx pyright
-
-      # Fails on the defect classes that kept reappearing by hand: an acceptance
-      # baseline behind HEAD, a timestamp claiming something happened later than
-      # now, and a document linking to a file that is not there. The second
-      # external review found six live contradictions of exactly these shapes,
-      # including a verification stamped 19:45Z inside a commit made at 19:43:14Z.
-      - name: repository consistency
-        run: uv run tools/repo_checks.py consistency
-
-      # Reports what the task still needs. The comment here used to claim this
-      # step was "non-blocking until submission" - it never was. There is no
-      # continue-on-error, so it has always failed the job, and it sat red while
-      # everyone read the comment instead of the behaviour. Kept blocking, which
-      # is now the right setting anyway: every deliverable exists, so a failure
-      # here is a real regression rather than work in progress.
-      - name: acceptance status (blocking)
-        run: uv run tools/repo_checks.py acceptance
+    uses: NDDev-Technocracy-OpenNetwork/nddev-ci/.github/workflows/recipe.yml@356a5b38a8fe5b4ac9d11266e42e6196dc6bde49 # v0.6.68
+    permissions:
+      contents: read
+    with:
+      hosted-runner: ubuntu-24.04
+      recipe: verify
+      prepare: setup-checks
+      python-version: 3.13.18
+      uv-version: 0.13.8
+      node-version: 26.13.1
+      fetch-depth: 0
+      tool-assets: .github/ci-tools.json
+      timeout-minutes: 20
 
   workflows:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/tools@c192c6adcf22088abf456635de614d42e8fa3f8d # nddev-cicd-v0.6.20
-        with:
-          capability: security
-      - name: Lint and audit workflows
-        run: |
-          actionlint
-          zizmor --offline --no-progress .github/workflows/ci.yml .github/workflows/security.yml
-      - name: Scan new pull request commits, or the full history on main
-        env:
-          BASE: ${{ github.event.pull_request.base.sha }}
-          HEAD: ${{ github.event.pull_request.head.sha }}
-        run: |
-          if [ -n "$BASE" ]; then
-            gitleaks git --no-banner --redact --log-opts="$BASE..$HEAD" .
-          else
-            gitleaks git --no-banner --redact .
-          fi
+    uses: NDDev-Technocracy-OpenNetwork/nddev-ci/.github/workflows/recipe.yml@356a5b38a8fe5b4ac9d11266e42e6196dc6bde49 # v0.6.68
+    permissions:
+      contents: read
+    with:
+      hosted-runner: ubuntu-24.04
+      recipe: audit-workflows
+      arguments: ${{ format('["{0}"]', github.event_name == 'pull_request' && format('{0}..{1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) || '--all') }}
+      fetch-depth: 0
+      tool-assets: .github/ci-tools.json
+      timeout-minutes: 10
 
+  merge-stops:
+    uses: NDDev-Technocracy-OpenNetwork/nddev-ci/.github/workflows/merge-stops.yml@356a5b38a8fe5b4ac9d11266e42e6196dc6bde49 # v0.6.68
+    permissions:
+      contents: read
+    with:
+      hosted-runner: ubuntu-24.04

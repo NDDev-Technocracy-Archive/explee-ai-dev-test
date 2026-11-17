@@ -140,47 +140,30 @@ docs/HANDOFF.md              picking this up on another machine
 
 ## Verification
 
-```bash
-# Pinned to the versions .github/workflows/ci.yml uses. An unpinned tool is not a
-# gate: an unpinned ruff once resolved to a different version in CI than on the
-# machine that ran it, so the same tree was clean in one place and had 49 errors
-# in the other. `ruff check .` bare is worse still, since it runs whatever
-# happens to be on your PATH.
-uv run --with 'pytest==8.3.4' pytest tests/ -q
-uv run --with 'ruff==0.15.17' ruff check .
-uv run --with pyright==1.1.411 --with pytest==8.3.4 --with httpx pyright
-uv run tools/repo_checks.py consistency
-uv run tools/repo_checks.py acceptance --strict
-```
-
-The last two are this repository's own checks: `consistency` fails if a document
-contradicts the tree, and `acceptance --strict` is what runs at submission. Both
-pass on a clean clone, not only here, which was itself a defect once.
-
-### Two workflows on the Actions tab are red, and it is not this repository
-
-`CI` is green and carries every correctness gate above. `security` and
-`scorecard` fail, and they fail **before creating a single job**. No logs, no
-steps, and the run is named after its file path, because nothing ever parsed the
-file far enough to read its `name:`.
-
-The cause is entirely outside this repository. Both call reusable workflows from
-`NDDev-it-com/ci-workflows`, which was archived. Archiving a repository disables
-its Actions, and **un-archiving does not re-enable them**, so there were two
-causes wearing one signature and the second stayed invisible until the first was
-cleared. Check it yourself:
+`requirements-ci.in` owns the existing direct tool selections and
+`requirements-ci.txt` locks their complete dependency graph with hashes.
 
 ```bash
-gh api repos/NDDev-it-com/ci-workflows -q .archived            # false
-gh api repos/NDDev-it-com/ci-workflows/actions/permissions      # enabled: false
+just setup-checks
+just check
+# On the admitted test executor:
+just verify
+# The existing submission-only strict acceptance:
+.venv/bin/python tools/repo_checks.py acceptance --strict
 ```
 
-Nothing in our workflow files is wrong: the pinned commit still declares
-`on: workflow_call` and all five called workflows resolve at it. What settled it
-was re-running a previously **successful** run unchanged and watching it flip to
-`startup_failure`. Nothing in the repository differed between the two attempts,
-which put the variable outside it.
+The same commands run in CI. The build-free check retains Ruff, unscoped
+Pyright, repository consistency and workflow validation. The full native job
+also executes the original pytest and blocking acceptance commands. Their
+scope and failure behavior are unchanged.
 
-The fix is one setting on a repository in another organisation, so it is not ours
-to make. This is written here rather than left for you to find, because a red
-badge with no explanation is indistinguishable from one nobody looked at.
+The shared source workflow retains pull-request-range and full-main/manual
+secret scanning, beside both existing CodeQL languages and Scorecard. Exact
+official workflow-tool assets are declared in `.github/ci-tools.json`;
+hosted jobs verify archive and executable bytes. Published workflow revisions
+and SDKs are pinned in the callers and maintained through ordinary updates.
+Required contexts and actual run results must be qualified for each new head.
+
+Validation performs no collector/monitor deployment, provider/model call,
+corpus processing or trace publication. Source maintenance preserves the
+historical records and the accepted bounded secret exceptions.

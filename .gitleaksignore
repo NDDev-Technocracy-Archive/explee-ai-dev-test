@@ -33,3 +33,9 @@ ebbe52fcf7ff0ed8c7d859665ec830facefe5c04:submission/task1-TRACE.md:github-pat:30
 # belong to the owner, revocation is impossible from our side, the repository is archived; history is kept.
 1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:generic-api-key:43
 11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:generic-api-key:43
+
+# Same two accepted historical occurrences from #8/#9: Betterleaks classifies
+# their existing generic-api-key finding as deepgram-api-key. This preserves
+# the accepted risk, not a fictitious-key claim; new commits remain blocking.
+1208dd870332152bf10ac3a54d4bdcf34d0144e7:tests/test_export_trace.py:deepgram-api-key:43
+11fac9e8871b6ce524dd63bb2389a9139ab41625:tests/test_export_trace.py:deepgram-api-key:43

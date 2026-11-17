@@ -629,19 +629,23 @@ credits, trailing spend and postpaid credit are five different things; a single
 
 ## Verification before delivery
 
-Four gates, not two. This section previously listed only the first two, which
-meant a green result here did not mean the repository was green, the type
-checker and the consistency check were the ones actually catching defects.
-Every version is pinned for the same reason: an unpinned checker runs a
-different ruleset locally than in CI, so the two can disagree and neither is
-wrong.
+The maintained tool selections live in `requirements-ci.in`; the generated
+`requirements-ci.txt` binds transitive versions and hashes. Commands do not
+repeat those editable versions.
 
-```bash
-uv run --with pytest==8.3.4 pytest tests/ -q
-uv run --with 'ruff==0.15.17' ruff check .
-uv run --with pyright==1.1.411 --with pytest==8.3.4 --with httpx pyright
-uv run tools/repo_checks.py consistency
-```
+Prepare with `just setup-checks`, then run `just check` for build-free
+Ruff, unscoped Pyright, repository consistency and workflow checks. Pyright
+explicitly reads the same prepared Python environment as pytest.
 
-`.claude/CLAUDE.md` carries the same list; if they ever diverge, that is a bug
-in one of them.
+On an admitted test executor, `just verify` also runs the original
+`pytest tests/ -q` and blocking `tools/repo_checks.py acceptance`. Submission
+still requires the existing strict acceptance command. Source checks alone do
+not establish that native tests or acceptance ran.
+
+`just audit-workflows` preserves the complete-history workflow-source scan.
+CI supplies the exact pull-request commit range on pull requests and full
+history on main/manual runs. The two historical accepted occurrences in issue8
+remain exact commit/path/line exceptions; other findings stay blocking.
+
+Neither setup nor validation operates the collector/monitor, touches its host,
+starts a provider/GPU/browser, reads the corpus or exports/publishes a trace.
