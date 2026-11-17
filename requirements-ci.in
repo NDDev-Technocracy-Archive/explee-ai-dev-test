@@ -1,0 +1,5 @@
+# Existing correctness tools; the generated lock owns transitive versions and hashes.
+ruff==0.15.17
+pyright==1.1.411
+pytest==8.3.4
+httpx
