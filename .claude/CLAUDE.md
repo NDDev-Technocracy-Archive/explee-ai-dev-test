@@ -15,14 +15,8 @@ Claude Code specifics, which are the only things not covered there:
 - Pane messaging goes through `tools/cmux_send.sh surface:N "text"`. Never
   hand-roll `cmux send` plus `send-key`: the Enter races the paste, the message
   sits unsent, and the sender never learns.
-- The four gates, run before every push, all exit codes checked:
-
-  ```bash
-  uv run --with 'pytest==8.3.4' pytest tests/ -q
-  uv run --with 'ruff==0.15.17' ruff check .        # pinned: unpinned checks a different ruleset
-  uv run --with pyright==1.1.411 --with pytest==8.3.4 --with httpx pyright  # pinned, same reason as ruff
-  uv run tools/repo_checks.py consistency
-  ```
+- Verification uses the commands in root `AGENTS.md`. Build-free checks and
+  admitted native/acceptance checks keep distinct execution boundaries.
 
 - **Every pane shares one working tree and one branch.** A commit cannot be held
   locally: the next agent to push carries yours to `origin` with it, whether or
