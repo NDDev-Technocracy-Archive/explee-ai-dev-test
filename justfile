@@ -6,8 +6,9 @@ default:
     @just --list
 
 # Prepare the hash-locked CI tools without building or installing the application.
-setup-checks python="python3":
+setup-checks python=env("UV_PYTHON", "python3"):
     uv venv --python "$1" --no-python-downloads .venv
+    .venv/bin/python -I -B --version
     uv pip install --python .venv/bin/python --require-hashes --only-binary=:all: -r requirements-ci.txt
 
 # Regenerate the CI tool lock from its existing direct version selections.
